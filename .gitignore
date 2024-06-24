@@ -1,0 +1,4 @@
+pacman
+qemu*
+test_*
+*.o
