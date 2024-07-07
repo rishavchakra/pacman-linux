@@ -1,8 +1,9 @@
 CC=aarch64-linux-gnu-gcc
 CFLAGS=-static
+LDLIBS=-lm
 
-SRCS = src/main.c
-HEADERS = 
+SRCS = src/main.c src/cache.c
+HEADERS = src/cache.h
 
 OBJS = $(SRCS:src/*.c=.o)
 
@@ -12,7 +13,7 @@ default: pacman
 	@echo Compiled executable: pacman - run with qemu-aarch64 pacman
 
 pacman: $(OBJS)
-	$(CC) $(CFLAGS) $(SRCS) $(HEADERS) -o pacman
+	$(CC) $(CFLAGS) $(SRCS) $(HEADERS) -o pacman $(LDLIBS)
 
 test: test-timer
 
