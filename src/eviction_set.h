@@ -28,8 +28,10 @@ eviction_set_t *evset_data(addr_t addr, addr_t region_base, size_t region_len);
 eviction_set_t *evset_p_data(addr_t target_vaddr, addr_t target_paddr,
                              addr_t region_base, size_t region_len);
 
-eviction_set_t *evset_p_inst();
+eviction_set_t *evset_p_inst(addr_t target_vaddr, addr_t target_paddr,
+                             addr_t region_base, size_t region_len);
 
-eviction_set_t *evset_kp_data();
+eviction_set_t *evset_kp_data(addr_t target_vaddr, addr_t target_paddr,
+                              addr_t kregion_base, size_t kregion_len);
 
 #endif // !__EVICTION_SET_H
