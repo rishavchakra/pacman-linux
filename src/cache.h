@@ -23,8 +23,7 @@ typedef struct {
   int size;
 } cache_t;
 
-typedef struct {
-  int page_size;
+extern struct {
   // Level 1 Data cache
   // Unified cache if no instruction cache exists
   cache_t l1d;
@@ -36,9 +35,7 @@ typedef struct {
   cache_t l3;
   // Other caches not supported yet. I'm not sure if there even is anything
   // other than l1i/d, l2, l3. Add handling logic to init_system_cache_info impl
-} cache_system_t;
-
-extern cache_system_t glob_cache_system;
+} glob_cache_system;
 
 // Initialized the global glob_cache_system struct
 // Reads the kernel's saved data about the CPU cache
@@ -70,5 +67,13 @@ uint64_t cache_get_l3_set(void *);
 
 // Get the offset of the data within the cache line
 uint64_t cache_get_l3_offset(void *);
+
+void cache_flush_l1i();
+
+void cache_flush_l1d();
+
+void cache_flush_l2();
+
+void cache_flush_l3();
 
 #endif

@@ -1,12 +1,13 @@
 #include "cache.h"
 #include <math.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
-cache_system_t glob_cache_system;
+struct glob_cache_system;
 
 //////////////// Helper functions ////////////////
 
@@ -17,7 +18,7 @@ int read_cache_info(cache_t *, int index);
 void init_system_cache_info() {
   int rc;
   int cache_ind = 0;
-  char l1_is_unified = 0;
+  bool l1_is_unified = 0;
   cache_t cache_read;
   while (1) {
     rc = read_cache_info(&cache_read, cache_ind);
@@ -45,6 +46,7 @@ void init_system_cache_info() {
       fprintf(stderr, "WARNING: Unknown cache detected: %d\n", cache_ind);
       break;
     }
+    printf("Cache %d info registered\n", cache_ind);
     cache_ind++;
   }
 }
@@ -158,8 +160,6 @@ uint64_t cache_get_l3_offset(void *addr) {
 }
 
 int read_cache_info(cache_t *cache, int index) {
-  glob_cache_system.page_size = getpagesize();
-
   const char *base_path = "/sys/devices/system/cpu/cpu0/cache/index";
   FILE *fptr;
 
@@ -188,7 +188,7 @@ int read_cache_info(cache_t *cache, int index) {
   {
     fptr = fopen(level_path, "r");
     if (!fptr) {
-      fprintf(stderr, "Cache %d level not found\n", index);
+      fprintf(stderr, "Cache %d not found\n", index);
       return -1;
     }
     fgets(level_val, 2, fptr);
