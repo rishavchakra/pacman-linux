@@ -16,11 +16,15 @@ default: pacman
 pacman: $(OBJS)
 	$(CC) $(CFLAGS) $(SRCS) $(HEADERS) -o pacman $(LDLIBS)
 
-test: test-timer
+test: test-timer test-kmod
 
 test-timer: src/tests/timers.o
 	$(CC) $(CFLAGS) src/tests/timers.c -o test_timer
 	@echo Compiled test: test_timer - run with qemu-aarch64 test_timer
+
+test-kmod: src/tests/kmodule.o src/kmodule.o
+	$(CC) $(CFLAGS) src/tests/kmodule.c src/kmodule.c -o test_kmod
+	@echo Compiled test: test_kmod - run with test_kmod
 
 obj-m += kmodule/main.o
 
