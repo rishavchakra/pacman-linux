@@ -36,12 +36,17 @@ static const struct proc_ops proc_file_ops = {
 
 typedef enum {
   OP_VIRT_TO_PHYS,
+  OP_DATA_GADGET,
   OP_ERR,
 } op_type_e;
 
 static op_type_e cur_op;
 
 static void *cur_vaddr;
+
+static void *cur_pac_ptr;
+
+static int cur_pac_rc;
 
 ////////////////////////////////////////////////////////////////
 /// Module init and cleanup
@@ -97,15 +102,50 @@ static ssize_t on_proc_write(struct file *file, const char __user *buffer,
   *offset += proc_buffer_size;
   pr_info("PACMAN: read %s\n", proc_buffer);
 
-  size_t read_vaddr;
-  int rc = sscanf(proc_buffer, "%zu", &read_vaddr);
-  if (rc == 0) {
-    cur_op = OP_ERR;
-    pr_info("PACMAN: pointer parsing failed with vaddr %zu\n", read_vaddr);
-    return -EFAULT;
+  if (proc_buffer[0] == 'v') {
+    // Virt -> phys translation request
+    size_t read_vaddr;
+    int rc = sscanf(proc_buffer + 1, "%zu", &read_vaddr);
+    if (rc == 0) {
+      cur_op = OP_ERR;
+      pr_info("PACMAN: pointer parsing failed with vaddr %zu\n", read_vaddr);
+      return -EFAULT;
+    }
+    cur_op = OP_VIRT_TO_PHYS;
+    cur_vaddr = (void *)read_vaddr;
+  } else if (proc_buffer[0] == 'd') {
+    // Data gadget request
+    // This one needs to be as FAST as possible
+
+    size_t read_ptr;
+    int rc = sscanf(proc_buffer + 2, "%zu", &read_ptr);
+    if (rc == 0) {
+      cur_pac_rc = -1;
+      // idk what this error means lol idc
+      return -EFAULT;
+    }
+    cur_pac_ptr = (void *)read_ptr;
+
+    // This is the pacman attack!
+    char cond = proc_buffer[1];
+    // Start of the speculative window
+    if (cond == 'y') {
+      // Do the pointer authentication here!
+      // Print statements will not print when run speculatively (buffered)
+      // (just make sure that they're at the end so they don't slow anything
+      // down)
+      pr_info(
+          "PACMAN: data gadget reached PAC authorizing condition\nPAC: %p\n",
+          cur_pac_ptr);
+      cur_pac_rc = 0;
+    } else {
+      // Do nothing
+      pr_info("PACMAN: data gadget reached base condition\n");
+      cur_pac_rc = 1;
+    }
+
+    cur_op = OP_DATA_GADGET;
   }
-  cur_op = OP_VIRT_TO_PHYS;
-  cur_vaddr = (void *)read_vaddr;
 
   return proc_buffer_size;
 }
@@ -123,15 +163,20 @@ static ssize_t on_proc_read(struct file *file, char __user *buffer,
   }
 
   char s[64];
-  phys_addr_t paddr = virt_to_phys(cur_vaddr);
-  sprintf(s, "%p", (void *)paddr);
-  len = strlen(s);
+  if (cur_op == OP_VIRT_TO_PHYS) {
+    phys_addr_t paddr = virt_to_phys(cur_vaddr);
+    sprintf(s, "%p", (void *)paddr);
+    len = strlen(s);
+  } else if (cur_op == OP_DATA_GADGET) {
+    sprintf(s, "%d", cur_pac_rc);
+    len = strlen(s);
+  }
 
   // const char *s = "Hello from PACMAN!\n";
   // ssize_t len = 19;
 
   if (*offset >= len || copy_to_user(buffer, s, len)) {
-    pr_info("PACMAN: procfile read failed\n");
+    pr_info("PACMAN: procfile read finished\n");
     return 0;
   }
 
