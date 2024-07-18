@@ -37,7 +37,8 @@ static const struct proc_ops proc_file_ops = {
 typedef enum {
   OP_VIRT_TO_PHYS,
   OP_DATA_GADGET,
-  OP_GET_TARGET,
+  OP_GET_TARGET_PADDR,
+  OP_GET_TARGET_VADDR,
   OP_ERR,
 } op_type_e;
 
@@ -150,10 +151,14 @@ static ssize_t on_proc_write(struct file *file, const char __user *buffer,
     }
 
     cur_op = OP_DATA_GADGET;
-  } else if (proc_buffer[0] == 't') {
+  } else if (proc_buffer[0] == 't' && proc_buffer[1] == 'p') {
     // Target function paddr request
     // No logic to be done, we return the address upon read
-    cur_op = OP_GET_TARGET;
+    cur_op = OP_GET_TARGET_PADDR;
+  } else if (proc_buffer[0] == 't' && proc_buffer[1] == 'v') {
+    cur_op = OP_GET_TARGET_VADDR;
+  } else {
+    cur_op = OP_ERR;
   }
 
   return proc_buffer_size;
@@ -179,8 +184,12 @@ static ssize_t on_proc_read(struct file *file, char __user *buffer,
   } else if (cur_op == OP_DATA_GADGET) {
     sprintf(s, "%d", cur_pac_rc);
     len = strlen(s);
-  } else if (cur_op == OP_GET_TARGET) {
+  } else if (cur_op == OP_GET_TARGET_PADDR) {
     // I believe this will properly get the pointer to the target fn
+    phys_addr_t paddr = virt_to_phys(target_function);
+    sprintf(s, "%p", (void *)paddr);
+    len = strlen(s);
+  } else if (cur_op == OP_GET_TARGET_VADDR) {
     sprintf(s, "%p", target_function);
     len = strlen(s);
   }
