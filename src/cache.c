@@ -7,7 +7,7 @@
 #include <string.h>
 #include <unistd.h>
 
-struct glob_cache_system;
+cache_system_t glob_cache_system;
 
 //////////////// Helper functions ////////////////
 

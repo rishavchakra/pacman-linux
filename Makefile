@@ -3,7 +3,7 @@ PWD:=$(CURDIR)
 CFLAGS=-static
 LDLIBS=-lm
 
-SRCS = src/main.c src/cache.c
+SRCS = src/main.c src/cache.c src/memory.c src/kmodule.c src/pacman.c src/eviction_set.c
 HEADERS = src/cache.h
 
 OBJS = $(SRCS:src/*.c=.o)

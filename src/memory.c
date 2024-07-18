@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <sys/mman.h>
 
-struct glob_mem_info;
+glob_mem_info_t glob_mem_info;
 
 void init_system_mem_info() {
   glob_mem_info.page_size = getpagesize();

@@ -3,13 +3,12 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include "memory.h"
 
 #define EVSET_STRIDE (4096 * 4096)
 #define EVSET_SIZE_MAX 1024
 
 //////////////// Eviction Set Data Type ////////////////
-
-typedef void *addr_t;
 
 typedef struct eviction_set eviction_set_t;
 
