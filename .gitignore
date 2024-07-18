@@ -2,3 +2,9 @@ pacman
 qemu*
 test_*
 *.o
+*.cmd
+*.mod
+*.ko
+*.symvers
+*.order
+kmodule/*.mod.c
