@@ -73,3 +73,29 @@ err:
   fclose(fptr);
   return -1;
 }
+
+void *kmod_get_paddr() {
+  FILE *fptr;
+
+  fptr = fopen(PROC_NAME, "w");
+  if (fptr == NULL) {
+    fprintf(stderr, "PACMAN kernel module is not running!\n");
+    goto err;
+  }
+
+  fprintf(fptr, "t");
+  fclose(fptr);
+
+  fptr = fopen(PROC_NAME, "r");
+  void *ret_paddr;
+  int rc = fscanf(fptr, "%p", &ret_paddr);
+  if (rc == EOF || rc == 0) {
+    goto err;
+  }
+  fclose(fptr);
+  return ret_paddr;
+
+err:
+  fclose(fptr);
+  return NULL;
+}

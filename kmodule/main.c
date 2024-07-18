@@ -37,6 +37,7 @@ static const struct proc_ops proc_file_ops = {
 typedef enum {
   OP_VIRT_TO_PHYS,
   OP_DATA_GADGET,
+  OP_GET_TARGET,
   OP_ERR,
 } op_type_e;
 
@@ -47,6 +48,9 @@ static void *cur_vaddr;
 static void *cur_pac_ptr;
 
 static int cur_pac_rc;
+
+// This is the function we're going to try to attack!
+static void target_function(void);
 
 ////////////////////////////////////////////////////////////////
 /// Module init and cleanup
@@ -116,6 +120,7 @@ static ssize_t on_proc_write(struct file *file, const char __user *buffer,
   } else if (proc_buffer[0] == 'd') {
     // Data gadget request
     // This one needs to be as FAST as possible
+    // Edit: only the contents of the if (cond == 'y') need to be blazingly fast
 
     size_t read_ptr;
     int rc = sscanf(proc_buffer + 2, "%zu", &read_ptr);
@@ -145,6 +150,10 @@ static ssize_t on_proc_write(struct file *file, const char __user *buffer,
     }
 
     cur_op = OP_DATA_GADGET;
+  } else if (proc_buffer[0] == 't') {
+    // Target function paddr request
+    // No logic to be done, we return the address upon read
+    cur_op = OP_GET_TARGET;
   }
 
   return proc_buffer_size;
@@ -170,6 +179,10 @@ static ssize_t on_proc_read(struct file *file, char __user *buffer,
   } else if (cur_op == OP_DATA_GADGET) {
     sprintf(s, "%d", cur_pac_rc);
     len = strlen(s);
+  } else if (cur_op == OP_GET_TARGET) {
+    // I believe this will properly get the pointer to the target fn
+    sprintf(s, "%p", target_function);
+    len = strlen(s);
   }
 
   // const char *s = "Hello from PACMAN!\n";
@@ -184,4 +197,8 @@ static ssize_t on_proc_read(struct file *file, char __user *buffer,
   *offset += len;
 
   return len;
+}
+
+static void target_function(void) {
+  pr_info("You hit the target function!\nPACMAN was successful!\n");
 }
