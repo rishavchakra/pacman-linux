@@ -4,7 +4,7 @@ CC=aarch64-linux-gnu-gcc
 CFLAGS=-static -march=armv8.4-a
 LDLIBS=-lm
 
-SRCS = src/main.c src/cache.c src/memory.c src/kmodule.c src/pacman.c src/eviction_set.c
+SRCS = src/main.c src/cache.c src/memory.c src/kmodule.c src/pacman.c src/eviction_set.c src/pac.c
 HEADERS = src/cache.h
 
 OBJS = $(SRCS:src/*.c=.o)
@@ -16,6 +16,10 @@ default: pacman
 
 pacman: $(OBJS)
 	$(CC) $(CFLAGS) $(SRCS) $(HEADERS) -o pacman $(LDLIBS)
+
+################################
+# Tests
+################################
 
 test: test-timer test-kmod test-pac
 
@@ -31,11 +35,23 @@ test-pac: src/tests/pac.o
 	$(CC) $(CFLAGS) src/tests/pac.c -o test_pac
 	@echo Compiled test: test_pac - run with qemu-aarch64 test_pac
 
+
+################################
+# Building the kernel module
+################################
+
+# Sources list
+# the build system checks for this variable
 obj-m += kmodule/main.o kmodule/pac_gadget.o
 
 kmod:
 	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
+	@echo Compiled PACMAN kernel module
+	@echo Start with sudo insmod kmodule/main.ko
+	@echo Stop with sudo rmmod kmodule/main.ko
 
+# This doesn't properly clean up all the kernel module building artifacts
+# but whatever
 clean:
 	rm pacman
 	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean
