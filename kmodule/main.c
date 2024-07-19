@@ -55,7 +55,7 @@ static int cur_pac_rc;
 // Instruction PACMAN
 
 // This is the function we're going to try to attack!
-static void vulnerable_syscall(const char *str, char cond);
+void vulnerable_syscall(const char *str, char cond);
 
 // This is the function we're going to try to point to
 // simulating arbitrary code execution, i guess
@@ -141,7 +141,7 @@ static ssize_t on_proc_write(struct file *file, const char __user *buffer,
 
     size_t read_ptr;
     char *read_str;
-    int rc = sscanf(proc_buffer + 2, "%s", &read_str);
+    int rc = sscanf(proc_buffer + 2, "%s", read_str);
     if (rc == 0) {
       cur_pac_rc = -1;
       // idk what this error means lol idc
@@ -173,7 +173,7 @@ static ssize_t on_proc_write(struct file *file, const char __user *buffer,
     cur_op = OP_DATA_GADGET;
   } else if (proc_buffer[0] == 'i') {
     char *read_str;
-    int rc = sscanf(proc_buffer + 2, "%s", &read_str);
+    int rc = sscanf(proc_buffer + 2, "%s", read_str);
     if (rc == 0) {
       cur_pac_rc = -1;
       pr_info("PACMAN: inst gadget failed reading string\n");
@@ -220,7 +220,7 @@ static ssize_t on_proc_read(struct file *file, char __user *buffer,
     sprintf(s, "%d", cur_pac_rc);
     len = strlen(s);
   } else if (cur_op == OP_INST_GADGET) {
-    spritnf(s, "%d", cur_pac_rc);
+    sprintf(s, "%d", cur_pac_rc);
     len = strlen(s);
   } else if (cur_op == OP_GET_TARGET_PADDR) {
     // I believe this will properly get the pointer to the target fn

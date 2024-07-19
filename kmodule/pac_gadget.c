@@ -11,7 +11,7 @@ typedef struct {
 // Some arbitrary salt number, doesn't matter
 static unsigned long long salt = 0x1122334455667788;
 
-static void vulnerable_syscall(const char *str, char cond) {
+void vulnerable_syscall(const char *str, char cond) {
   obj_t obj;
   memcpy(obj.buf, str, strlen(str));
 
