@@ -1,7 +1,9 @@
 PWD:=$(CURDIR)
 CC=aarch64-linux-gnu-gcc
+KMODCC=aarch64-linux-gnu-gcc-13
 # Neoverse V1 of AWS instance uses armv8.4-a
 CFLAGS=-static -march=armv8.4-a
+KMODCFLAGS=-march=armv8.4-a
 LDLIBS=-lm
 
 SRCS = src/main.c src/cache.c src/memory.c src/kmodule.c src/pacman.c src/eviction_set.c src/pac.c
@@ -45,13 +47,11 @@ test-pac: src/tests/pac.o
 obj-m += kmodule/main.o kmodule/pac_gadget.o
 
 kmod:
-	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
+	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) CC=$(KMODCC) CFLAGS=$(KMODCFLAGS) modules
 	@echo Compiled PACMAN kernel module
 	@echo Start with sudo insmod kmodule/main.ko
 	@echo Stop with sudo rmmod kmodule/main.ko
 
-# This doesn't properly clean up all the kernel module building artifacts
-# but whatever
 clean:
 	rm pacman
 	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean
