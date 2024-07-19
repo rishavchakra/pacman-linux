@@ -1,6 +1,7 @@
 PWD:=$(CURDIR)
 CC=aarch64-linux-gnu-gcc
-CFLAGS=-static
+# Neoverse V1 of AWS instance uses armv8.4-a
+CFLAGS=-static -march=armv8.4-a
 LDLIBS=-lm
 
 SRCS = src/main.c src/cache.c src/memory.c src/kmodule.c src/pacman.c src/eviction_set.c
@@ -27,7 +28,7 @@ test-kmod: src/tests/kmodule.o src/kmodule.o
 	@echo Compiled test: test_kmod - run with test_kmod
 
 test-pac: src/tests/pac.o
-	$(CC) $(CFLAGS) src/tests/pac.c test_pac
+	$(CC) $(CFLAGS) src/tests/pac.c -o test_pac
 	@echo Compiled test: test_pac - run with qemu-aarch64 test_pac
 
 obj-m += kmodule/main.o kmodule/pac_gadget.o
