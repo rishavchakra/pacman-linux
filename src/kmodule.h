@@ -8,6 +8,8 @@ void *kmod_virt_to_phys(void *);
 
 int kmod_data_gadget(bool take_pac_path, void *guess_ptr);
 
+void kmod_inst_gadget(bool take_pac_path, char *str);
+
 // Returns a pointer to some target function/instruction
 // physical address, for use in generating an eviction set
 addr_t kmod_get_paddr();

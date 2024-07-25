@@ -55,15 +55,7 @@ int kmod_data_gadget(bool take_pac_path, void *guess_ptr) {
     goto err;
   }
 
-  if (proc_rc == 0) {
-    printf("Kernel module took PAC authorization path!\n");
-  } else if (proc_rc == 1) {
-    printf("Kernel module took base path!\n");
-  } else if (proc_rc == -1) {
-    printf("Kernel module data gadget errored! Check dmesg\n");
-  } else {
-    printf("what?\n");
-  }
+  printf("Check dmesg for kernel result!\n");
 
   fclose(fptr);
   return 0;
@@ -72,6 +64,25 @@ err:
   printf("ERROR: kmod data gadget\n");
   fclose(fptr);
   return -1;
+}
+
+void kmod_inst_gadget(bool take_pac_path, char *str) {
+  FILE *fptr;
+
+  fptr = fopen(PROC_NAME, "w");
+  if (fptr == NULL) {
+    fprintf(stderr, "PACMAN kernel module is not running!\n");
+    goto err;
+  }
+
+  fprintf(fptr, "i%c%s", take_pac_path ? 'y' : 'n', str);
+  fclose(fptr);
+
+  printf("Check dmesg for kernel result!\n");
+
+err:
+  printf("ERROR: kmod inst gadget\n");
+  fclose(fptr);
 }
 
 void *kmod_get_paddr() {
