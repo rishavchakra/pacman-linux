@@ -52,21 +52,19 @@ void init_system_cache_info() {
 }
 
 uint64_t cache_get_l1_tag(void *addr) {
-  uint64_t addr_num = (uint64_t) addr;
+  uint64_t addr_num = (uint64_t)addr;
   int offset_length =
       (int)(round(log2((double)glob_cache_system.l1i.line_size)));
-  int set_length =
-      (int)(round(log2((double)glob_cache_system.l1i.sets)));
+  int set_length = (int)(round(log2((double)glob_cache_system.l1i.sets)));
   return addr_num >> (offset_length + set_length);
 }
 
 uint64_t cache_get_l1_set(void *addr) {
-  uint64_t addr_num = (uint64_t) addr;
+  uint64_t addr_num = (uint64_t)addr;
   uint64_t mask = 0xFFFFFFFFFFFFFFFF;
   int offset_length =
       (int)(round(log2((double)glob_cache_system.l1i.line_size)));
-  int set_length =
-      (int)(round(log2((double)glob_cache_system.l1i.sets)));
+  int set_length = (int)(round(log2((double)glob_cache_system.l1i.sets)));
   // Clear set-> bits
   mask >>= offset_length + set_length;
   mask <<= offset_length + set_length;
@@ -77,7 +75,7 @@ uint64_t cache_get_l1_set(void *addr) {
 }
 
 uint64_t cache_get_l1_offset(void *addr) {
-  uint64_t addr_num = (uint64_t) addr;
+  uint64_t addr_num = (uint64_t)addr;
   int offset_length =
       (int)(round(log2((double)glob_cache_system.l1i.line_size)));
   uint64_t mask = 0xFFFFFFFFFFFFFFFF;
@@ -88,21 +86,19 @@ uint64_t cache_get_l1_offset(void *addr) {
 }
 
 uint64_t cache_get_l2_tag(void *addr) {
-  uint64_t addr_num = (uint64_t) addr;
+  uint64_t addr_num = (uint64_t)addr;
   int offset_length =
       (int)(round(log2((double)glob_cache_system.l2.line_size)));
-  int set_length =
-      (int)(round(log2((double)glob_cache_system.l2.sets)));
+  int set_length = (int)(round(log2((double)glob_cache_system.l2.sets)));
   return addr_num >> (offset_length + set_length);
 }
 
 uint64_t cache_get_l2_set(void *addr) {
-  uint64_t addr_num = (uint64_t) addr;
+  uint64_t addr_num = (uint64_t)addr;
   uint64_t mask = 0xFFFFFFFFFFFFFFFF;
   int offset_length =
       (int)(round(log2((double)glob_cache_system.l2.line_size)));
-  int set_length =
-      (int)(round(log2((double)glob_cache_system.l2.sets)));
+  int set_length = (int)(round(log2((double)glob_cache_system.l2.sets)));
   // Clear set-> bits
   mask >>= offset_length + set_length;
   mask <<= offset_length + set_length;
@@ -113,7 +109,7 @@ uint64_t cache_get_l2_set(void *addr) {
 }
 
 uint64_t cache_get_l2_offset(void *addr) {
-  uint64_t addr_num = (uint64_t) addr;
+  uint64_t addr_num = (uint64_t)addr;
   int offset_length =
       (int)(round(log2((double)glob_cache_system.l2.line_size)));
   uint64_t mask = 0xFFFFFFFFFFFFFFFF;
@@ -124,21 +120,19 @@ uint64_t cache_get_l2_offset(void *addr) {
 }
 
 uint64_t cache_get_l3_tag(void *addr) {
-  uint64_t addr_num = (uint64_t) addr;
+  uint64_t addr_num = (uint64_t)addr;
   int offset_length =
       (int)(round(log2((double)glob_cache_system.l3.line_size)));
-  int set_length =
-      (int)(round(log2((double)glob_cache_system.l3.sets)));
+  int set_length = (int)(round(log2((double)glob_cache_system.l3.sets)));
   return addr_num >> (offset_length + set_length);
 }
 
 uint64_t cache_get_l3_set(void *addr) {
-  uint64_t addr_num = (uint64_t) addr;
+  uint64_t addr_num = (uint64_t)addr;
   uint64_t mask = 0xFFFFFFFFFFFFFFFF;
   int offset_length =
       (int)(round(log2((double)glob_cache_system.l3.line_size)));
-  int set_length =
-      (int)(round(log2((double)glob_cache_system.l3.sets)));
+  int set_length = (int)(round(log2((double)glob_cache_system.l3.sets)));
   // Clear set-> bits
   mask >>= offset_length + set_length;
   mask <<= offset_length + set_length;
@@ -149,7 +143,7 @@ uint64_t cache_get_l3_set(void *addr) {
 }
 
 uint64_t cache_get_l3_offset(void *addr) {
-  uint64_t addr_num = (uint64_t) addr;
+  uint64_t addr_num = (uint64_t)addr;
   int offset_length =
       (int)(round(log2((double)glob_cache_system.l3.line_size)));
   uint64_t mask = 0xFFFFFFFFFFFFFFFF;
@@ -158,6 +152,17 @@ uint64_t cache_get_l3_offset(void *addr) {
   mask = ~mask;
   return addr_num & mask;
 }
+
+// TODO
+// (how do I even flush the instruction cache? will it work to just load in a
+// bunch of functions into function pointers?)
+void cache_flush_l1i() {}
+
+void cache_flush_l1d() {}
+
+void cache_flush_l2() {}
+
+void cache_flush_l3() {}
 
 int read_cache_info(cache_t *cache, int index) {
   const char *base_path = "/sys/devices/system/cpu/cpu0/cache/index";

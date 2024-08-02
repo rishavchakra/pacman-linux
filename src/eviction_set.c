@@ -1,5 +1,6 @@
 #include "eviction_set.h"
 #include "cache.h"
+#include "kmodule.h"
 #include "memory.h"
 #include <stddef.h>
 #include <stdint.h>
@@ -37,12 +38,14 @@ void eviction_set_push(eviction_set_t *evset, addr_t el) {
 
 void eviction_set_free(eviction_set_t *evset) { free(evset->buf); }
 
-addr_t *get(eviction_set_t *evset) {
-  return evset->buf;
-}
+addr_t *get(eviction_set_t *evset) { return evset->buf; }
 
-size_t length(eviction_set_t *evset) {
-  return evset->length;
+size_t length(eviction_set_t *evset) { return evset->length; }
+
+eviction_set_t *evset_v_for_paddr(addr_t target_paddr, addr_t region_base,
+                                  size_t region_len) {
+  eviction_set_t *evset = eviction_set_new();
+
 }
 
 eviction_set_t *evset_inst(addr_t addr, addr_t region_base, size_t region_len) {
