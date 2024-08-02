@@ -1,3 +1,4 @@
+#include "gadgets.h"
 #include <linux/string.h>
 // Having a struct like this is one way to do it
 // another would be to overwrite the function return value

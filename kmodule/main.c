@@ -1,3 +1,4 @@
+#include "gadgets.h"
 #include <asm/io.h>
 #include <linux/fs.h>
 #include <linux/init.h>
@@ -53,9 +54,6 @@ static void *cur_pac_ptr;
 static int cur_pac_rc;
 
 // Instruction PACMAN
-
-// This is the function we're going to try to attack!
-void auth_syscall(const char *str, char cond);
 
 // This is the function we're going to try to point to
 // simulating arbitrary code execution, i guess
