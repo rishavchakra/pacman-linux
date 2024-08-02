@@ -44,11 +44,11 @@ test-pac: src/tests/pac.o
 
 # Sources list
 # the build system checks for this variable
-obj-m += kmodule/main.o kmodule/pac_gadget.o
+obj-m += kmodule/main.o kmodule/gadgets.o
 
 # Attach CFlags to kmod objects
 CFLAGS_kmodule/main.o := -march=armv8.4-a
-CFLAGS_kmodule/pac_gadget.o := -march=armv8.4-a
+CFLAGS_kmodule/gadgets.o := -march=armv8.4-a
 
 kmod:
 	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) CC=$(KMODCC) modules
