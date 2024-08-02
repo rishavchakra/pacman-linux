@@ -1,4 +1,3 @@
-#include "gadgets.h"
 #include <asm/io.h>
 #include <linux/fs.h>
 #include <linux/init.h>
@@ -67,6 +66,18 @@ static char *safe = "blahblahblah";
 // The pointer that is not signed that the attacker attempts to forge a
 // signature for The attacker knows only the virtual address, not the contents
 static char *secret = "secret string!";
+
+// Some arbitrary salt number, doesn't matter
+static unsigned long long salt = 0x1122334455667788;
+
+// This is the function we're going to try to attack!
+void auth_syscall(const char *str, char cond);
+
+// Example vulnerable struct
+typedef struct {
+  char buf[8];
+  void (*fp)(void);
+} obj_t;
 
 ////////////////////////////////////////////////////////////////
 /// Module init and cleanup
@@ -247,4 +258,22 @@ static ssize_t on_proc_read(struct file *file, char __user *buffer,
 
 static void target_function(void) {
   pr_info("PACMAN: You hit the target function!\nPACMAN was successful!\n");
+}
+void auth_syscall(const char *str, char cond) {
+  obj_t obj;
+  memcpy(obj.buf, str, strlen(str));
+
+  void *temp;
+
+  // Start of the speculative window, if 'n' is taken
+  if (cond == 'y') {
+    // authorize the function pointer
+    asm("autia %[ptr], %[salt]" : [ptr] "+r"(obj.fp) : [salt] "r"(salt));
+
+    // Make sure the pointer is cached
+    temp = obj.fp;
+  } else {
+    // no-op, effectively
+    return;
+  }
 }
