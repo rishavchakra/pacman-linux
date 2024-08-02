@@ -11,16 +11,19 @@ typedef struct {
 // Some arbitrary salt number, doesn't matter
 static unsigned long long salt = 0x1122334455667788;
 
-void vulnerable_syscall(const char *str, char cond) {
+void auth_syscall(const char *str, char cond) {
   obj_t obj;
   memcpy(obj.buf, str, strlen(str));
 
-  // Start of the speculative window
+  void *temp;
+
+  // Start of the speculative window, if 'n' is taken
   if (cond == 'y') {
     // authorize the function pointer
     asm("autia %[ptr], %[salt]" : [ptr] "+r"(obj.fp) : [salt] "r"(salt));
-    // call the function pointer
-    obj.fp();
+
+    // Make sure the pointer is cached
+    temp = obj.fp;
   } else {
     // no-op, effectively
     return;

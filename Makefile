@@ -46,8 +46,12 @@ test-pac: src/tests/pac.o
 # the build system checks for this variable
 obj-m += kmodule/main.o kmodule/pac_gadget.o
 
+# Attach CFlags to kmod objects
+CFLAGS_kmodule/main.o := -march=armv8.4-a
+CFLAGS_kmodule/pac_gadget.o := -march=armv8.4-a
+
 kmod:
-	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) CC=$(KMODCC) CFLAGS=$(KMODCFLAGS) modules
+	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) CC=$(KMODCC) modules
 	@echo Compiled PACMAN kernel module
 	@echo Start with sudo insmod kmodule/main.ko
 	@echo Stop with sudo rmmod kmodule/main.ko

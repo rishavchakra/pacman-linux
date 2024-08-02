@@ -66,7 +66,7 @@ err:
   return -1;
 }
 
-void kmod_inst_gadget(bool take_pac_path, char *str) {
+void kmod_auth_gadget(bool take_pac_path, char *str) {
   FILE *fptr;
 
   fptr = fopen(PROC_NAME, "w");

@@ -38,7 +38,7 @@ static const struct proc_ops proc_file_ops = {
 typedef enum {
   OP_VIRT_TO_PHYS,
   OP_DATA_GADGET,
-  OP_INST_GADGET,
+  OP_AUTH_GADGET,
   OP_GET_TARGET_PADDR,
   OP_GET_TARGET_VADDR,
   OP_ERR,
@@ -55,7 +55,7 @@ static int cur_pac_rc;
 // Instruction PACMAN
 
 // This is the function we're going to try to attack!
-void vulnerable_syscall(const char *str, char cond);
+void auth_syscall(const char *str, char cond);
 
 // This is the function we're going to try to point to
 // simulating arbitrary code execution, i guess
@@ -171,7 +171,7 @@ static ssize_t on_proc_write(struct file *file, const char __user *buffer,
     // }
 
     cur_op = OP_DATA_GADGET;
-  } else if (proc_buffer[0] == 'i') {
+  } else if (proc_buffer[0] == 'a') {
     char *read_str;
     int rc = sscanf(proc_buffer + 2, "%s", read_str);
     if (rc == 0) {
@@ -183,12 +183,12 @@ static ssize_t on_proc_write(struct file *file, const char __user *buffer,
 
     pr_info("PACMAN:\nTaking PAC path: %c\nString input: %s\n", cond, read_str);
 
-    vulnerable_syscall(read_str, cond);
+    auth_syscall(read_str, cond);
 
-    cur_op = OP_INST_GADGET;
+    cur_op = OP_AUTH_GADGET;
   } else if (proc_buffer[0] == 't' && proc_buffer[1] == 'p') {
     // Target function paddr request
-    // No logic to be done, we return the address upon read
+    // No logic to be done here, we return the address upon read
     cur_op = OP_GET_TARGET_PADDR;
   } else if (proc_buffer[0] == 't' && proc_buffer[1] == 'v') {
     cur_op = OP_GET_TARGET_VADDR;
@@ -219,7 +219,7 @@ static ssize_t on_proc_read(struct file *file, char __user *buffer,
   } else if (cur_op == OP_DATA_GADGET) {
     sprintf(s, "%d", cur_pac_rc);
     len = strlen(s);
-  } else if (cur_op == OP_INST_GADGET) {
+  } else if (cur_op == OP_AUTH_GADGET) {
     sprintf(s, "%d", cur_pac_rc);
     len = strlen(s);
   } else if (cur_op == OP_GET_TARGET_PADDR) {

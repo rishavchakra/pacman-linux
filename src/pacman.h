@@ -8,7 +8,7 @@
 
 // This needs to be sufficiently high so that the branch predictor WILL think a
 // path is certain. If not, we run into a kernel crash (stakes are high!)
-#define NUM_BRANCHPRED_TRAIN 24
+#define NUM_BRANCHPRED_TRAIN 2048
 
 // MIT code used something like this
 // not necessary for a demo

@@ -37,6 +37,14 @@ void eviction_set_push(eviction_set_t *evset, addr_t el) {
 
 void eviction_set_free(eviction_set_t *evset) { free(evset->buf); }
 
+addr_t *get(eviction_set_t *evset) {
+  return evset->buf;
+}
+
+size_t length(eviction_set_t *evset) {
+  return evset->length;
+}
+
 eviction_set_t *evset_inst(addr_t addr, addr_t region_base, size_t region_len) {
   eviction_set_t *evset = eviction_set_new();
 
