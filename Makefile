@@ -37,6 +37,9 @@ test-pac: src/tests/pac.o
 	$(CC) $(CFLAGS) src/tests/pac.c -o test_pac
 	@echo Compiled test: test_pac - run with qemu-aarch64 test_pac
 
+test-cache-time: src/tests/cache_timing.o src/kmodule.o src/timer.o
+	$(CC) $(CFLAGS) src/tests/cache_timing.c src/kmodule.c src/timer.c -o test_cache_time
+	@echo Compiled test: test_cache_time
 
 ################################
 # Building the kernel module

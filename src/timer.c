@@ -46,7 +46,7 @@ uint64_t time_exec(addr_t addr) {
                "isb\n\t"
                "mrs %[t1], PMCCNTR_EL0\n\t"
                "isb\n\t"
-               "blr [%[addr]]\n\t"
+               "blr %[addr]\n\t"
                "isb\n\t"
                "mrs %[t2], PMCCNTR_EL0\n\t"
                "isb\n\t"

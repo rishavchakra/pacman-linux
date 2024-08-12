@@ -136,3 +136,23 @@ err:
   fclose(fptr);
   return NULL;
 }
+
+void kmod_flush_cache(addr_t addr) {
+  FILE *fptr;
+
+  fptr = fopen(PROC_NAME, "w");
+  if (fptr == NULL) {
+    fprintf(stderr, "PACMAN kernel module is not running!\n");
+    goto err;
+  }
+
+  fprintf(fptr, "c%zu", (size_t)addr);
+  fclose(fptr);
+  // No return information from kmodule for this one
+
+  return;
+
+err:
+  fclose(fptr);
+  return;
+}

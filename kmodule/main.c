@@ -41,6 +41,7 @@ typedef enum {
   OP_AUTH_GADGET,
   OP_GET_TARGET_PADDR,
   OP_GET_TARGET_VADDR,
+  OP_FLUSH_CACHE_LINE,
   OP_ERR,
 } op_type_e;
 
@@ -201,6 +202,23 @@ static ssize_t on_proc_write(struct file *file, const char __user *buffer,
     cur_op = OP_GET_TARGET_PADDR;
   } else if (proc_buffer[0] == 't' && proc_buffer[1] == 'v') {
     cur_op = OP_GET_TARGET_VADDR;
+  } else if (proc_buffer[0] == 'c') {
+    // Flush a cache line
+    size_t read_vaddr;
+    int rc = sscanf(proc_buffer + 1, "%zu", &read_vaddr);
+    if (rc == 0) {
+      cur_op = OP_ERR;
+      pr_info("PACMAN: pointer parsing failed with vaddr %zu\n", read_vaddr);
+      return -EFAULT;
+    }
+    // DC CVAC:
+    // Data Cache Clean by VA to Point of Coherence (DRAM?)
+    asm volatile("dc cvac, %[va]" ::[va] "r"(read_vaddr));
+
+    // This command runs entirely from the kernel read, not from the user read
+    // These two for use if I ever need a return value workflow
+    cur_op = OP_FLUSH_CACHE_LINE;
+    cur_vaddr = (void *)read_vaddr;
   } else {
     cur_op = OP_ERR;
   }
@@ -240,6 +258,11 @@ static ssize_t on_proc_read(struct file *file, char __user *buffer,
     // TODO: Make sure this function pointer is signed
     sprintf(s, "%p", target_function);
     len = strlen(s);
+  } else if (cur_op == OP_FLUSH_CACHE_LINE) {
+    // DC CVAC:
+    // Data Cache Clean by VA to Point of Coherence (DRAM?)
+    asm volatile("dc cvac, %[va]" ::[va] "r"(cur_vaddr));
+    // No return value for this one I guess, just clean the cache and leave
   }
 
   // const char *s = "Hello from PACMAN!\n";

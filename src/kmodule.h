@@ -18,4 +18,6 @@ addr_t kmod_get_paddr();
 // virtual address, for use in the actual PAC generation and testing
 addr_t kmod_get_vaddr();
 
+void kmod_flush_cache(addr_t);
+
 #endif // !__KMODULE_H
